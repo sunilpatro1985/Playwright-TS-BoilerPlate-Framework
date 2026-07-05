@@ -1,0 +1,13 @@
+node_modules/
+test-results/
+allure-results/
+allure-report/
+html-report/
+Downloads/
+html-report.zip/
+.env
+.env.*
+credentials.json
+credentials.enc.json
+credentials.example.json
+.DS_Store
