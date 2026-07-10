@@ -69,7 +69,7 @@ jobs:
       - name: Run Playwright tests
         id: run_tests
         continue-on-error: true
-        run: npx playwright test ${{ inputs.test_names }}
+        run: xvfb-run npx playwright test ${{ inputs.test_names }}
 
       - name: Wait for reporters to finalize
         if: always()
