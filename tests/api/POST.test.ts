@@ -1,4 +1,4 @@
-import { APIActions } from '@lib/apiUtil';
+import { APIActions } from '@base/APIActions';
 import { test } from '@playwright/test';
 
 const apiActions = new APIActions();

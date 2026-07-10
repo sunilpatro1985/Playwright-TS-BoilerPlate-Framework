@@ -4,9 +4,12 @@ allure-results/
 allure-report/
 html-report/
 Downloads/
-html-report.zip/
+html-report.zip
 .env
 .env.*
 # credentials.json
 credentials.enc.json
 .DS_Store
+/har
+/logs/
+visualComparision.test.ts-snapshots/
