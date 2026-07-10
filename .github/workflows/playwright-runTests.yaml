@@ -1,0 +1,148 @@
+name: Playwright Tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      env:
+        description: 'Environment'
+        required: true
+        type: choice
+        default: prod
+        options:
+          - qa
+          - dev
+          - prod
+      region:
+        description: 'Region'
+        required: true
+        type: choice
+        default: US
+        options:
+          - US
+          - UK
+          - CA
+      browser:
+        description: 'Browser(s) - comma-separated (chrome,firefox) or "all"'
+        required: true
+        type: string
+        default: chrome
+      test_names:
+        description: 'Optional: test file(s) or --grep pattern (e.g. tests/functional/Login.test.ts or --grep @Smoke). Leave empty to run everything.'
+        required: false
+        type: string
+        default: ''
+      recipients:
+        description: 'Optional: comma-separated email addresses to send the report to. Leave empty to use the default distribution list secret.'
+        required: false
+        type: string
+        default: ''
+
+permissions:
+  contents: read
+
+env:
+  ENV: ${{ inputs.env }}
+  REGION: ${{ inputs.region }}
+  BROWSER: ${{ inputs.browser }}
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run Playwright tests
+        id: run_tests
+        continue-on-error: true
+        run: npx playwright test ${{ inputs.test_names }}
+
+      - name: Wait for reporters to finalize
+        if: always()
+        run: sleep 5
+
+      - name: Check report generation
+        if: always()
+        run: |
+          if [ -f html-report/index.html ]; then
+            echo "✓ HTML report generated successfully"
+          else
+            echo "⚠ HTML report not found - test may have been killed before reporter finalized"
+            ls -la html-report/ 2>/dev/null || echo "html-report directory does not exist"
+          fi
+
+      - name: Zip HTML report
+        if: always()
+        run: |
+          if [ -d html-report ]; then
+            zip -r html-report.zip html-report
+          else
+            echo "html-report directory not found, skipping zip."
+          fi
+
+      - name: Upload test reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ inputs.env }}-${{ inputs.region }}-${{ github.run_id }}
+          path: |
+            html-report/
+            test-results/
+            allure-results/
+            logs/
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Upload zipped report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: html-report-zip-${{ github.run_id }}
+          path: html-report.zip
+          retention-days: 30
+          if-no-files-found: ignore
+
+      - name: Email report to participants
+        if: always()
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: ${{ secrets.MAIL_SERVER }}
+          server_port: ${{ secrets.MAIL_PORT }}
+          username: ${{ secrets.MAIL_USERNAME }}
+          password: ${{ secrets.MAIL_PASSWORD }}
+          subject: >-
+            [${{ steps.run_tests.outcome == 'success' && 'PASSED' || 'FAILED' }}]
+            Playwright Tests - ${{ inputs.env }}/${{ inputs.region }} (Run #${{ github.run_number }})
+          to: ${{ inputs.recipients != '' && inputs.recipients || secrets.MAIL_DEFAULT_RECIPIENTS }}
+          from: AAFM Playwright CI
+          body: |
+            Playwright test run completed.
+
+            Status:      ${{ steps.run_tests.outcome == 'success' && 'PASSED' || 'FAILED' }}
+            Environment: ${{ inputs.env }}
+            Region:      ${{ inputs.region }}
+            Browser(s):  ${{ inputs.browser }}
+            Test filter: ${{ inputs.test_names != '' && inputs.test_names || 'all tests' }}
+            Triggered by: ${{ github.actor }}
+            Run URL:     ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+            The HTML report is attached (zip).
+          attachments: html-report.zip
+
+      - name: Fail job if tests failed
+        if: steps.run_tests.outcome == 'failure'
+        run: exit 1
