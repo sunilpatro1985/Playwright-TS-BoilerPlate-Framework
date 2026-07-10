@@ -7,6 +7,6 @@ Downloads/
 html-report.zip/
 .env
 .env.*
-credentials.json
+# credentials.json
 credentials.enc.json
 .DS_Store
