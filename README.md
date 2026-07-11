@@ -199,10 +199,10 @@ npm run test:record
 
 ```bash
 # Run tests on specific environment
-npx cross-env TEST_ENV=qa npm test
+npx cross-env ENV=qa npm test
 
 # Run tests on specific region
-npx cross-env TEST_ENV=prod TEST_REGION=UK npm test
+npx cross-env ENV=prod REGION=UK npm test
 
 # Run tests on specific browser
 npx cross-env BROWSER=firefox npm test
@@ -284,7 +284,7 @@ docker build -t playwright-tests .
 docker run playwright-tests
 
 # Run with custom environment
-docker run -e TEST_ENV=qa playwright-tests
+docker run -e ENV=qa playwright-tests
 ```
 
 ### Docker Configuration

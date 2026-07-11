@@ -9,8 +9,8 @@ const credentialsData = require('./credentials.json') as CredentialsData;
 
 const domainURL = 'saucedemo.com';
 
-const ENV = process.env.TEST_ENV ?? 'prod';
-const REGION = process.env.TEST_REGION ?? 'US';
+const ENV = process.env.ENV ?? 'prod';
+const REGION = process.env.REGION ?? 'US';
 
 function getCurrentEnvAndRegion(): { env: string; region: string } {
     const normalizedEnv = ENV.toLowerCase();
@@ -18,12 +18,12 @@ function getCurrentEnvAndRegion(): { env: string; region: string } {
 
     // Only validate if an invalid value is provided (defaults are already valid)
     if (!['qa', 'dev', 'prod'].includes(normalizedEnv)) {
-        console.log(`Please provide a correct environment value like "npx cross-env TEST_ENV=qa|dev|prod"`);
+        console.log(`Please provide a correct environment value like "npx cross-env ENV=qa|dev|prod"`);
         process.exit();
     }
 
     if (!['us', 'uk'].includes(normalizedRegion)) {
-        console.log(`Please provide a correct region value like "npx cross-env TEST_REGION=us|uk"`);
+        console.log(`Please provide a correct region value like "npx cross-env REGION=us|uk"`);
         process.exit();
     }
 
