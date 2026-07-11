@@ -13,7 +13,9 @@
     "test:record": "npx playwright codegen",
     "test:visual": "npx playwright test visualComparision.test.ts --project=Chrome",
     "test:device": "npx playwright test Emulation.test.ts --project=Device",
-    "allureReport": "npx allure serve allure-results"  
+    "allureReport": "npx allure serve allure-results",
+    "creds:encrypt": "npx ts-node utils/credentials-encryptor.ts encrypt",
+    "creds:decrypt": "npx ts-node utils/credentials-encryptor.ts decrypt"
   },
   "repository": {
     "type": "git",
