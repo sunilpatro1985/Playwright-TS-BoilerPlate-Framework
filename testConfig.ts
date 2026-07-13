@@ -9,8 +9,9 @@ const credentialsData = require('./credentials.json') as CredentialsData;
 
 const domainURL = 'saucedemo.com';
 
-const ENV = process.env.TEST_ENV ?? 'prod';
-const REGION = process.env.TEST_REGION ?? 'US';
+// Use TEST_ENV/TEST_REGION to avoid conflicts with system environment variables (e.g., corporate shell hooks)
+const ENV = process.env.TEST_ENV || 'prod';
+const REGION = process.env.TEST_REGION || 'US';
 
 function getCurrentEnvAndRegion(): { env: string; region: string } {
     const normalizedEnv = ENV.toLowerCase();

@@ -284,7 +284,7 @@ docker build -t playwright-tests .
 docker run playwright-tests
 
 # Run with custom environment
-docker run -e TEST_ENV=qa playwright-tests
+docker run -e ENV=qa playwright-tests
 ```
 
 ### Docker Configuration
