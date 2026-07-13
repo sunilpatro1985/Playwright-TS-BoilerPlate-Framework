@@ -41,8 +41,8 @@ permissions:
   contents: read
 
 env:
-  ENV: ${{ inputs.env }}
-  REGION: ${{ inputs.region }}
+  TEST_ENV: ${{ inputs.env }}
+  TEST_REGION: ${{ inputs.region }}
   BROWSER: ${{ inputs.browser }}
 
 jobs:
