@@ -110,10 +110,13 @@ jobs:
       - name: Zip HTML report
         if: always()
         run: |
-          if [ -d html-report ]; then
+          if [ -d html-report ] && [ "$(ls -A html-report 2>/dev/null)" ]; then
             zip -r html-report.zip html-report
           else
-            echo "html-report directory not found, skipping zip."
+            echo "html-report directory not found or empty, creating placeholder zip."
+            mkdir -p html-report
+            echo "No HTML report was generated for this test run." > html-report/README.txt
+            zip -r html-report.zip html-report
           fi
 
       - name: Upload test reports
