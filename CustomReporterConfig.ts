@@ -14,6 +14,9 @@ const logger = winston.createLogger({
   // Writes logs to console
   logger.add(console);
 
+// Export logger for use in other modules
+export { logger };
+
 export default class CustomReporterConfig implements Reporter {
 
     onTestBegin(test: TestCase): void {

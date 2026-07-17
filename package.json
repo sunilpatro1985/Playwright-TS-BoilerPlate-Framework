@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "test": "npx playwright test",
+    "test:zip": "npx playwright test && npm run zip:report",
     "test:single": "npx playwright test HAR.test.ts --project=Chrome",
     "test:parallel": "npx playwright test --grep @Smoke --project=Chrome",
     "test:serial": "npx playwright test --grep @Smoke --workers=1 --project=Chrome",
@@ -13,9 +14,10 @@
     "test:record": "npx playwright codegen",
     "test:visual": "npx playwright test visualComparision.test.ts --project=Chrome",
     "test:device": "npx playwright test Emulation.test.ts --project=Device",
+    "zip:report": "npx ts-node scripts/zip-report.ts",
     "allureReport": "npx allure serve allure-results",
-    "creds:encrypt": "npx ts-node utils/credentials-encryptor.ts encrypt",
-    "creds:decrypt": "npx ts-node utils/credentials-encryptor.ts decrypt"
+    "creds:encrypt": "npx ts-node scripts/credentials-encryptor.ts encrypt",
+    "creds:decrypt": "npx ts-node scripts/credentials-encryptor.ts decrypt"
   },
   "repository": {
     "type": "git",

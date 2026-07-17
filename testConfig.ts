@@ -36,13 +36,16 @@ function getCurrentEnvAndRegion(): { env: string; region: string } {
 
 
 
-export const testConfig: Record<string, string> = {
+export const testConfig = {
     waitForElement: `120000`,
     dbUsername: ``,
     dbPassword: ``,
     dbServerName: ``,
     dbPort: ``,
-    dbName: ``
+    dbName: ``,
+    // Set to true to auto-zip HTML report after local test runs
+    // Set to false to skip zipping and save time during development
+    zipReportLocally: false
 };
 
 export function getDynamicBaseUrl(): string {
@@ -61,8 +64,9 @@ export function getDynamicBaseUrl(): string {
 
 export function getCredentials(role = 'default'): { username: string; password: string } {
     const { env, region } = getCurrentEnvAndRegion();
+    const regionKey = region.toUpperCase(); // credentials.json uses uppercase region keys
     
-    const regionCredentials = credentialsData?.[env]?.[region] ?? [];
+    const regionCredentials = credentialsData?.[env]?.[regionKey] ?? [];
     const selectedCredential = regionCredentials.find((entry) => entry.role?.toLowerCase() === role.toLowerCase())
         ?? regionCredentials[0]
         ?? { username: '', password: '' };
