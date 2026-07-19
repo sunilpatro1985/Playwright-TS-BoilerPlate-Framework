@@ -36,9 +36,24 @@ on:
         required: false
         type: string
         default: ''
+      publish_report:
+        description: 'Publish report to GitHub Pages'
+        required: true
+        type: choice
+        default: none
+        options:
+          - none
+          - playwright-html
+          - allure
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
 
 env:
   TEST_ENV: ${{ inputs.env }}
@@ -153,7 +168,7 @@ jobs:
             [${{ steps.run_tests.outcome == 'success' && 'PASSED' || 'FAILED' }}]
             Playwright Tests - ${{ inputs.env }}/${{ inputs.region }} (Run #${{ github.run_number }})
           to: ${{ inputs.recipients != '' && inputs.recipients || secrets.MAIL_DEFAULT_RECIPIENTS }}
-          from: AAFM Playwright CI
+          from: SKP Playwright CI
           body: |
             Playwright test run completed.
 
@@ -164,10 +179,55 @@ jobs:
             Test filter: ${{ inputs.test_names != '' && inputs.test_names || 'all tests' }}
             Triggered by: ${{ github.actor }}
             Run URL:     ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+            ${{ inputs.publish_report != 'none' && format('Report URL: https://{0}.github.io/{1}/', github.repository_owner, github.event.repository.name) || '' }}
 
             The HTML report is attached (zip).
           attachments: html-report.zip
 
+      # === GitHub Pages Report Publishing ===
+      - name: Get Allure history (for trend charts)
+        if: always() && inputs.publish_report == 'allure'
+        continue-on-error: true
+        uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: gh-pages
+
+      - name: Copy Allure history
+        if: always() && inputs.publish_report == 'allure'
+        run: |
+          mkdir -p allure-results/history
+          cp -r gh-pages/history/* allure-results/history/ 2>/dev/null || true
+
+      - name: Generate Allure Report
+        if: always() && inputs.publish_report == 'allure'
+        run: npx allure generate allure-results --clean -o allure-report
+
+      - name: Upload Playwright HTML Report to Pages
+        if: always() && inputs.publish_report == 'playwright-html'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: html-report/
+
+      - name: Upload Allure Report to Pages
+        if: always() && inputs.publish_report == 'allure'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: allure-report/
+
       - name: Fail job if tests failed
         if: steps.run_tests.outcome == 'failure'
         run: exit 1
+
+  # Deploy to GitHub Pages (only if publish_report is not 'none')
+  deploy-report:
+    needs: e2e-tests
+    if: always() && inputs.publish_report != 'none'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
