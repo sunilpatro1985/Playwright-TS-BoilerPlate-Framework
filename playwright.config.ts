@@ -10,11 +10,12 @@ const selectedBrowsers = (BROWSER && BROWSER.length > 0 ? BROWSER : 'chrome')
   .map(b => b.trim())
   .filter(b => b.length > 0);
 
-
-//const envName = ENV as keyof typeof testConfig;
+// Determine base URL: use static API URL for api browser, otherwise use dynamic URL
+const isApiOnly = selectedBrowsers.length === 1 && selectedBrowsers[0] === 'api';
+const baseURL = isApiOnly ? testConfig.apiBaseUrl : getDynamicBaseUrl();
 
 const sharedUse = {
-  baseURL: getDynamicBaseUrl(),
+  baseURL: baseURL,
   actionTimeout: 10000,
   headless: true,
   viewport: { width: 1500, height: 730 },

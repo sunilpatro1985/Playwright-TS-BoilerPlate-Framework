@@ -45,7 +45,9 @@ export const testConfig = {
     dbName: ``,
     // Set to true to auto-zip HTML report after local test runs
     // Set to false to skip zipping and save time during development
-    zipReportLocally: false
+    zipReportLocally: false,
+    // Static API base URL for API testing
+    apiBaseUrl: 'https://gorest.in'
 };
 
 export function getDynamicBaseUrl(): string {
