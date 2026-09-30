@@ -1,0 +1,45 @@
+name: Decrypt App Data Example
+
+# This is an example workflow showing how to decrypt appData.enc.json in GitHub Actions
+# Before running your tests, add this step to decrypt the app data file
+
+on:
+  workflow_dispatch:
+
+jobs:
+  decrypt-example:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      # This step decrypts the appData.enc.json file to appData.json
+      # The ENCRYPTION_KEY secret must be set in your GitHub repository settings
+      - name: Decrypt app data
+        env:
+          ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
+        run: npm run creds:decrypt
+
+      - name: Verify app data decrypted
+        run: |
+          if [ -f appData.json ]; then
+            echo "✓ App data successfully decrypted"
+            # Verify it's valid JSON
+            cat appData.json | jq . > /dev/null && echo "✓ JSON is valid"
+          else
+            echo "✗ App data file not found"
+            exit 1
+          fi
+
+      # Example: Run your tests with decrypted app data
+      # - name: Run tests
+      #   run: npm test

@@ -81,23 +81,23 @@ jobs:
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
-          # This step decrypts the credentials.enc.json file to credentials.json
+          # This step decrypts the appData.enc.json file to appData.json
       # The ENCRYPTION_KEY secret must be set in your GitHub repository settings
-      - name: Decrypt credentials
+      - name: Decrypt app data
         env:
           ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
         run: npm run creds:decrypt
 
-      - name: Verify credentials decrypted
+      - name: Verify app data decrypted
         run: |
-          if [ -f credentials.json ]; then
-            echo "✓ Credentials successfully decrypted"
+          if [ -f appData.json ]; then
+            echo "✓ App data successfully decrypted"
             # Verify it's valid JSON
-            cat credentials.json | jq . > /dev/null && echo "✓ JSON is valid"
+            cat appData.json | jq . > /dev/null && echo "✓ JSON is valid"
           else
-            echo "✗ Credentials file not found"
+            echo "✗ App data file not found"
             exit 1
-          fi  
+          fi
 
       - name: Run Playwright tests
         id: run_tests
@@ -118,9 +118,9 @@ jobs:
             ls -la html-report/ 2>/dev/null || echo "html-report directory does not exist"
           fi
 
-      - name: Remove decrypted credentials
+      - name: Remove decrypted app data
         if: always()
-        run: rm -f credentials.json    
+        run: rm -f appData.json
 
       - name: Zip HTML report
         if: always()

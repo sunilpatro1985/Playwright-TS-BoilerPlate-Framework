@@ -16,8 +16,8 @@
     "test:device": "npx playwright test Emulation.test.ts --project=Device",
     "zip:report": "npx ts-node scripts/zip-report.ts",
     "allureReport": "npx allure serve allure-results",
-    "creds:encrypt": "npx ts-node scripts/credentials-encryptor.ts encrypt",
-    "creds:decrypt": "npx ts-node scripts/credentials-encryptor.ts decrypt"
+    "creds:encrypt": "npx ts-node scripts/appData-encryptor.ts encrypt",
+    "creds:decrypt": "npx ts-node scripts/appData-encryptor.ts decrypt"
   },
   "repository": {
     "type": "git",

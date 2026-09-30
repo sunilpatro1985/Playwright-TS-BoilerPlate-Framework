@@ -1,0 +1,67 @@
+{
+  "defaults": {
+    "env": "prod",
+    "region": "US",
+    "role": "default"
+  },
+  "credentials": {
+    "qa": {
+      "US": [
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        },
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        }
+      ],
+      "UK": [
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        }
+      ]
+    },
+    "dev": {
+      "US": [
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        }
+      ],
+      "UK": [
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        }
+      ]
+    },
+    "prod": {
+      "US": [
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        },
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        }
+      ],
+      "UK": [
+        {
+          "role": "default",
+          "username": "",
+          "password": ""
+        }
+      ]
+    }
+  }
+}

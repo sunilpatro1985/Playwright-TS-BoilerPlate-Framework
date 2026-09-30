@@ -1,19 +1,19 @@
 #!/bin/bash
 
-# Credentials Encryption Setup Script
-# This script helps you set up the encryption/decryption system for credentials.json
+# App Data Encryption Setup Script
+# This script helps you set up the encryption/decryption system for appData.json
 
 set -e
 
 echo "=========================================="
-echo "Credentials Encryption Setup"
+echo "App Data Encryption Setup"
 echo "=========================================="
 echo ""
 
-# Check if credentials.json exists
-if [ ! -f "credentials.json" ]; then
-    echo "❌ Error: credentials.json not found"
-    echo "Please ensure credentials.json exists in the project root"
+# Check if appData.json exists
+if [ ! -f "appData.json" ]; then
+    echo "❌ Error: appData.json not found"
+    echo "Please ensure appData.json exists in the project root"
     exit 1
 fi
 
@@ -34,18 +34,18 @@ fi
 
 export ENCRYPTION_KEY
 
-# Encrypt the credentials
+# Encrypt the app data
 echo ""
-echo "Encrypting credentials.json..."
+echo "Encrypting appData.json..."
 npm run creds:encrypt
 
 echo ""
 echo "✓ Setup complete!"
 echo ""
 echo "Next steps:"
-echo "1. Verify credentials.enc.json was created: ls -la credentials.enc.json"
-echo "2. Add encrypted file to git: git add credentials.enc.json"
-echo "3. Commit: git commit -m 'Add encrypted credentials'"
+echo "1. Verify appData.enc.json was created: ls -la appData.enc.json"
+echo "2. Add encrypted file to git: git add appData.enc.json"
+echo "3. Commit: git commit -m 'Add encrypted app data'"
 echo "4. Store encryption key in GitHub Secrets or .env file"
 echo ""
 echo "To decrypt locally later:"

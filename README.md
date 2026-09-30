@@ -304,7 +304,7 @@ The included Dockerfile:
 |------|---------|
 | `playwright.config.ts` | Browser, timeout, reporter settings |
 | `testConfig.ts` | Environment URLs, credentials, DB config |
-| `credentials.json` | User credentials per environment |
+| `appData.json` | Default env/region/role and user credentials per environment |
 | `CustomReporterConfig.ts` | Winston logging configuration |
 
 ### Test Settings (playwright.config.ts)

@@ -103,23 +103,23 @@ if (require.main === module) {
   if (!command || !['encrypt', 'decrypt'].includes(command)) {
     console.log(`
 Usage:
-  npx ts-node utils/credentials-encryptor.ts encrypt
-  npx ts-node utils/credentials-encryptor.ts decrypt
+  npx ts-node scripts/credentials-encryptor.ts encrypt
+  npx ts-node scripts/credentials-encryptor.ts decrypt
 
 Environment Variables:
   ENCRYPTION_KEY - The encryption/decryption key (optional, uses default if not set)
 
 Examples:
-  ENCRYPTION_KEY="my-secret-key" npx ts-node utils/credentials-encryptor.ts encrypt
-  ENCRYPTION_KEY="my-secret-key" npx ts-node utils/credentials-encryptor.ts decrypt
+  ENCRYPTION_KEY="my-secret-key" npx ts-node scripts/credentials-encryptor.ts encrypt
+  ENCRYPTION_KEY="my-secret-key" npx ts-node scripts/credentials-encryptor.ts decrypt
     `);
     process.exit(1);
   }
 
   const config: EncryptionConfig = {
     encryptionKey: encryptionKey,
-    inputFile: command === 'encrypt' ? 'credentials.json' : 'credentials.enc.json',
-    outputFile: command === 'encrypt' ? 'credentials.enc.json' : 'credentials.json',
+    inputFile: command === 'encrypt' ? 'appData.json' : 'appData.enc.json',
+    outputFile: command === 'encrypt' ? 'appData.enc.json' : 'appData.json',
   };
 
   if (command === 'encrypt') {

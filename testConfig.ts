@@ -4,16 +4,30 @@ type CredentialEntry = {
     password: string;
 };
 
+type AppDefaults = {
+    env: string;
+    region: string;
+    role: string;
+};
+
 type CredentialsData = Record<string, Record<string, CredentialEntry[]>>;
-const credentialsData = require('./credentials.json') as CredentialsData;
+
+type AppData = {
+    defaults: AppDefaults;
+    credentials: CredentialsData;
+};
+
+const appData = require('./appData.json') as AppData;
+const credentialsData = appData.credentials;
+const appDefaults = appData.defaults;
 
 const domainURL = 'saucedemo.com';
 
 // Use TEST_ENV/TEST_REGION to avoid conflicts with system environment variables (e.g., corporate shell hooks)
-const ENV = process.env.TEST_ENV || 'prod';
-const REGION = process.env.TEST_REGION || 'US';
+const ENV = process.env.TEST_ENV || appDefaults.env;
+const REGION = process.env.TEST_REGION || appDefaults.region;
 
-function getCurrentEnvAndRegion(): { env: string; region: string } {
+export function getCurrentEnvAndRegion(): { env: string; region: string } {
     const normalizedEnv = ENV.toLowerCase();
     const normalizedRegion = REGION.toLowerCase();
 
@@ -64,9 +78,9 @@ export function getDynamicBaseUrl(): string {
     return `https://${host}/`;
 }
 
-export function getCredentials(role = 'default'): { username: string; password: string } {
+export function getCredentials(role = appDefaults.role): { username: string; password: string } {
     const { env, region } = getCurrentEnvAndRegion();
-    const regionKey = region.toUpperCase(); // credentials.json uses uppercase region keys
+    const regionKey = region.toUpperCase(); // appData.json credentials use uppercase region keys
     
     const regionCredentials = credentialsData?.[env]?.[regionKey] ?? [];
     const selectedCredential = regionCredentials.find((entry) => entry.role?.toLowerCase() === role.toLowerCase())

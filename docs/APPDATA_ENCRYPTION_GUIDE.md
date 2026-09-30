@@ -1,14 +1,14 @@
 # Credentials Encryption/Decryption Guide
 
-This guide explains how to use the encryption/decryption utilities to securely manage your `credentials.json` file.
+This guide explains how to use the encryption/decryption utilities to securely manage your `appData.json` file.
 
 ## Overview
 
-The `credentials.json` file contains sensitive test data (usernames, passwords, API keys, etc.) that should **never** be committed to git in plain text. Instead:
+The `appData.json` file contains sensitive test data (usernames, passwords, API keys, etc.) that should **never** be committed to git in plain text. Instead:
 
-1. **Encrypt** `credentials.json` → `credentials.enc.json`
-2. **Commit** only `credentials.enc.json` to git (safe)
-3. **Decrypt** `credentials.enc.json` → `credentials.json` locally or in CI/CD
+1. **Encrypt** `appData.json` → `appData.enc.json`
+2. **Commit** only `appData.enc.json` to git (safe)
+3. **Decrypt** `appData.enc.json` → `appData.json` locally or in CI/CD
 
 ---
 
@@ -45,22 +45,22 @@ ENCRYPTION_KEY="my-super-secret-key-min-16-chars" npm run creds:encrypt
 ```
 
 **Output:**
-- Reads: `credentials.json`
-- Creates: `credentials.enc.json`
+- Reads: `appData.json`
+- Creates: `appData.enc.json`
 - Original file remains unchanged
 
 ### 3. **Add to Git** (Only the Encrypted File)
 
 ```bash
-git add credentials.enc.json
-git commit -m "Add encrypted credentials"
+git add appData.enc.json
+git commit -m "Add encrypted app data"
 git push
 ```
 
 **Verify .gitignore includes:**
 ```
-# credentials.json (plain text - NEVER commit this)
-credentials.enc.json
+# appData.json (plain text - NEVER commit this)
+appData.enc.json
 ```
 
 ### 4. **Decrypt When Needed**
@@ -73,7 +73,7 @@ ENCRYPTION_KEY="my-super-secret-key-min-16-chars" npm run creds:decrypt
 
 #### In GitHub Actions:
 ```yaml
-- name: Decrypt credentials
+- name: Decrypt app data
   env:
     ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
   run: npm run creds:decrypt
@@ -86,12 +86,12 @@ ENCRYPTION_KEY="my-super-secret-key-min-16-chars" npm run creds:decrypt
 ### Local Development Workflow
 
 ```bash
-# 1. First time setup - encrypt your credentials
+# 1. First time setup - encrypt your app data
 ENCRYPTION_KEY="your-secure-key" npm run creds:encrypt
 
 # 2. Commit encrypted file
-git add credentials.enc.json
-git commit -m "Add encrypted credentials"
+git add appData.enc.json
+git commit -m "Add encrypted app data"
 
 # 3. Decrypt for local testing (when needed)
 ENCRYPTION_KEY="your-secure-key" npm run creds:decrypt
@@ -99,7 +99,7 @@ ENCRYPTION_KEY="your-secure-key" npm run creds:decrypt
 # 4. Run tests
 npm test
 
-# 5. credentials.json is in .gitignore, so it won't be committed
+# 5. appData.json is in .gitignore, so it won't be committed
 ```
 
 ### GitHub Actions Workflow
@@ -122,13 +122,13 @@ npm test
    - name: Install dependencies
      run: npm ci
    
-   # Decrypt credentials before running tests
-   - name: Decrypt credentials
+   # Decrypt app data before running tests
+   - name: Decrypt app data
      env:
        ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
      run: npm run creds:decrypt
    
-   # Now credentials.json is available for your tests
+   # Now appData.json is available for your tests
    - name: Run tests
      run: npm test
    ```
@@ -136,7 +136,7 @@ npm test
 ### Team Collaboration
 
 ```bash
-# When teammate pulls encrypted credentials:
+# When teammate pulls encrypted app data:
 git pull
 
 # Get encryption key from team lead (via secure channel)
@@ -157,20 +157,20 @@ npm test
 ### Import the Functions
 
 ```typescript
-import { encryptCredentials, decryptCredentials } from './utils/credentials-encryptor';
+import { encryptCredentials, decryptCredentials } from './scripts/appData-encryptor';
 
 // Encrypt
 encryptCredentials({
   encryptionKey: 'your-secret-key',
-  inputFile: 'credentials.json',
-  outputFile: 'credentials.enc.json'
+  inputFile: 'appData.json',
+  outputFile: 'appData.enc.json'
 });
 
 // Decrypt
 decryptCredentials({
   encryptionKey: 'your-secret-key',
-  inputFile: 'credentials.enc.json',
-  outputFile: 'credentials.json'
+  inputFile: 'appData.enc.json',
+  outputFile: 'appData.json'
 });
 ```
 
@@ -179,8 +179,8 @@ decryptCredentials({
 ```typescript
 // Uses ENCRYPTION_KEY env variable, falls back to default
 encryptCredentials({
-  inputFile: 'credentials.json',
-  outputFile: 'credentials.enc.json'
+  inputFile: 'appData.json',
+  outputFile: 'appData.enc.json'
 });
 ```
 
@@ -224,10 +224,10 @@ ENCRYPTION_KEY="your-key" npm run creds:decrypt
 - Store the key locally in `.env` (gitignored)
 - Rotate keys periodically
 - Share keys via secure channels (not email, Slack, Discord)
-- Delete `credentials.json` after decrypting locally (if you don't need it)
+- Delete `appData.json` after decrypting locally (if you don't need it)
 
 ### ❌ DON'T:
-- Commit `credentials.json` to git
+- Commit `appData.json` to git
 - Share encryption keys in plain text
 - Use weak/short encryption keys
 - Commit `.env` files
@@ -251,28 +251,28 @@ ENCRYPTION_KEY="exact-key-used-to-encrypt" npm run creds:decrypt
 **Solution:** Ensure the file exists before encryption/decryption:
 ```bash
 # Verify files exist
-ls -la credentials.json      # For encryption
-ls -la credentials.enc.json  # For decryption
+ls -la appData.json      # For encryption
+ls -la appData.enc.json  # For decryption
 ```
 
 ### "JSON is invalid"
 
 **Solution:** The original JSON may be malformed. Check it:
 ```bash
-cat credentials.json | jq .
+cat appData.json | jq .
 ```
 
-### GitHub Actions: "credentials.json not found"
+### GitHub Actions: "appData.json not found"
 
 **Solution:** Ensure decryption step runs before tests:
 ```yaml
-- name: Decrypt credentials
+- name: Decrypt app data
   env:
     ENCRYPTION_KEY: ${{ secrets.ENCRYPTION_KEY }}
   run: npm run creds:decrypt
 
 - name: Verify decryption
-  run: test -f credentials.json && echo "OK" || echo "FAILED"
+  run: test -f appData.json && echo "OK" || echo "FAILED"
 
 - name: Run tests  # This comes AFTER decryption
   run: npm test
@@ -285,18 +285,18 @@ cat credentials.json | jq .
 ### Available npm Scripts:
 
 ```bash
-npm run creds:encrypt   # Encrypt credentials.json → credentials.enc.json
-npm run creds:decrypt   # Decrypt credentials.enc.json → credentials.json
+npm run creds:encrypt   # Encrypt appData.json → appData.enc.json
+npm run creds:decrypt   # Decrypt appData.enc.json → appData.json
 ```
 
 ### CLI Direct Usage:
 
 ```bash
 # Encrypt
-npx ts-node utils/credentials-encryptor.ts encrypt
+npx ts-node scripts/appData-encryptor.ts encrypt
 
 # Decrypt
-npx ts-node utils/credentials-encryptor.ts decrypt
+npx ts-node scripts/appData-encryptor.ts decrypt
 ```
 
 ---
@@ -305,15 +305,15 @@ npx ts-node utils/credentials-encryptor.ts decrypt
 
 ```
 project-root/
-├── credentials.json           (gitignored - never commit)
-├── credentials.enc.json       (commit to git)
+├── appData.json           (gitignored - never commit)
+├── appData.enc.json       (commit to git)
 ├── .env                       (gitignored - local only)
 ├── .gitignore                 (includes both above)
 ├── utils/
-│   └── credentials-encryptor.ts    (utility functions)
+│   └── appData-encryptor.ts    (utility functions)
 ├── package.json               (has new npm scripts)
 └── .github/workflows/
-    └── decrypt-credentials-example.yaml    (example workflow)
+    └── decrypt-appdata-example.yaml    (example workflow)
 ```
 
 ---
@@ -328,4 +328,4 @@ project-root/
 
 ## Questions?
 
-Refer to `.github/workflows/decrypt-credentials-example.yaml` for a complete example or check the comments in `utils/credentials-encryptor.ts`.
+Refer to `.github/workflows/decrypt-appdata-example.yaml` for a complete example or check the comments in `scripts/appData-encryptor.ts`.
