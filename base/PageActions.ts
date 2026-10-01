@@ -18,24 +18,24 @@ export class PageActions {
         await this.page.goto("");
     }
 
-    async decipherPassword(): Promise<string> {
+    async decipherPassword(password: string): Promise<string> {
         const key = `SECRET`;
         //ENCRYP
         // const cipher = CryptoJS.AES.encrypt('demouat',key);
         // console.log(cipher.toString());
-        return CryptoJS.AES.decrypt(testConfig.password, key).toString(CryptoJS.enc.Utf8);
+        return CryptoJS.AES.decrypt(password, key).toString(CryptoJS.enc.Utf8);
     }
 
     async waitForPageNavigation(event: string): Promise<void> {
         switch (event.toLowerCase()) {
             case `networkidle`:
-                await this.page.waitForNavigation({ waitUntil: `networkidle`, timeout: waitForElement });
+                await this.page.waitForLoadState(`networkidle`,{ timeout: waitForElement });
                 break;
             case `load`:
-                await this.page.waitForNavigation({ waitUntil: `load`, timeout: waitForElement });
+                await this.page.waitForLoadState(`load`,{ timeout: waitForElement });
                 break;
             case `domcontentloaded`:
-                await this.page.waitForNavigation({ waitUntil: `domcontentloaded`, timeout: waitForElement });
+                await this.page.waitForLoadState(`domcontentloaded`,{ timeout: waitForElement });
         }
     }
 
@@ -96,6 +96,9 @@ export class PageActions {
         const workbook = new Workbook();
         return workbook.xlsx.readFile(`./Downloads/${fileName}`).then(function () {
             const sheet = workbook.getWorksheet(sheetName);
+            if(!sheet){
+                throw new Error(`Sheet not found: ${sheetName} in file: ${fileName}`);
+            }
             return sheet.getRow(rowNum).getCell(cellNum).toString();
         });
     }
